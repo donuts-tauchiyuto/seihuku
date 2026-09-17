@@ -54,7 +54,6 @@
 
   <script>
     const LIFF_ID = "2011615012-KQalAnEM";
-    // ★↓↓ お客様のGASのデプロイURLをここに貼り付けてください ↓↓★
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyOlALG5EBN8I8dD03gLU3scAyoZ2CtYJPxZuWF_zCLZivRXBgWKmiBPvr-m36rMUGKBA/exec";
     
     let lineUserId = "";
@@ -102,19 +101,27 @@
       };
 
       try {
-        // ★GASのURLに向けてPOST通信でデータを投げ飛ばす！（成功パターンの仕組み）
         await fetch(GAS_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain" },
           body: JSON.stringify(payload)
         });
 
-        document.getElementById("loading").innerHTML = "✅ 登録完了！<br>画面上部の「×」で閉じてください";
+        document.getElementById("loading").innerHTML = "✅ 登録完了！<br>自動でLINEに戻ります...";
         document.getElementById("loading").style.color = "#00ff00";
 
-        // GitHub環境なら安全に画面を閉じられます
+        // ★修正ポイント：メッセージを送ってから画面を閉じるようにしました！
         if (liff.isInClient()) {
-          liff.closeWindow();
+          liff.sendMessages([{ type: 'text', text: '回答しました！' }])
+            .then(() => {
+              liff.closeWindow();
+            })
+            .catch((err) => {
+              console.error("メッセージ送信エラー:", err);
+              liff.closeWindow();
+            });
+        } else {
+          window.close();
         }
       } catch (error) {
         document.getElementById("loading").innerHTML = "❌ 送信エラー: 通信に失敗しました";
