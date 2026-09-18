@@ -154,7 +154,7 @@
       btn.disabled = true;
       btn.innerText = "送信中...";
 
-      const messageText = `【面談希望日のご連絡】\nお名前：${userName}\n希望日：${dateVal}\n時間帯：${timeVal}\n\n※担当者からの返信をお待ちください。`;
+      const messageText = `【面談希望日のご連絡】\nお名前：${userName}\n希望日：${dateVal}\n時間帯：${timeVal}`;
 
       if (liff.isInClient()) {
         liff.sendMessages([{ type: 'text', text: messageText }])
