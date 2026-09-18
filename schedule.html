@@ -4,7 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>日程調整・お客様情報入力</title>
+  
+  <!-- カレンダーを強化するライブラリ（Flatpickr）を読み込み -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&display=swap');
     
@@ -112,14 +119,6 @@
       padding-right: 40px;
     }
 
-    .warning-text {
-      color: var(--accent-red);
-      font-size: 0.8rem;
-      font-weight: 700;
-      margin-top: 6px;
-      display: block;
-    }
-
     .submit-btn {
       width: 100%;
       padding: 16px;
@@ -138,6 +137,48 @@
       background: #ccc;
       box-shadow: none;
       cursor: not-allowed;
+    }
+
+    /* オリジナルポップアップ（通知画面）のデザイン */
+    .custom-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .custom-modal {
+      background: #fff;
+      width: 85%;
+      max-width: 350px;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .custom-modal h3 {
+      color: var(--primary-pink);
+      margin-bottom: 12px;
+      font-size: 1.2rem;
+    }
+    .custom-modal p {
+      font-size: 0.95rem;
+      color: #444;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+    .custom-modal button {
+      background: var(--primary-pink);
+      color: #fff;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 30px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      width: 100%;
     }
   </style>
 </head>
@@ -159,14 +200,12 @@
 
       <div class="form-group">
         <label>希望日（平日のみ） <span class="req">*</span></label>
-        <!-- ★今日より前の日程を選択不可に制限★ -->
-        <input type="date" id="dateSelect" onchange="validateDate(this)" required>
-        <span class="warning-text">⚠️土日は選択できません。平日をお選びください。</span>
+        <!-- HTML標準カレンダーではなく、文字入力風にしてFlatpickrを呼び出す -->
+        <input type="text" id="dateSelect" placeholder="日付を選択してください" readonly required>
       </div>
 
       <div class="form-group">
         <label>希望時間帯 <span class="req">*</span></label>
-        <!-- ★指定の3つの選択肢に変更★ -->
         <select id="timeSelect" required>
           <option value="" disabled selected>選択してください</option>
           <option value="10:00 〜 11:00">10:00 〜 11:00</option>
@@ -179,17 +218,32 @@
     </form>
   </div>
 
+  <!-- ドメイン名を隠すためのオリジナルポップアップ -->
+  <div id="customModal" class="custom-modal-overlay">
+    <div class="custom-modal">
+      <h3 id="modalTitle">通知</h3>
+      <p id="modalMessage">メッセージ</p>
+      <button onclick="closeModal()">OK</button>
+    </div>
+  </div>
+
   <script>
     const LIFF_ID = "2011615012-KQalAnEM"; 
 
+    // ★カレンダー（Flatpickr）の初期設定
     document.addEventListener("DOMContentLoaded", function() {
-      // 本日の日付を取得してカレンダーの最小値(min)に設定（過去日を選択不可に）
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
-      const dd = String(today.getDate()).padStart(2, '0');
-      document.getElementById("dateSelect").min = `${yyyy}-${mm}-${dd}`;
+      flatpickr("#dateSelect", {
+        locale: "ja",             // 日本語化
+        minDate: "today",         // 過去の日付をグレーアウトして選択不可に
+        disable: [
+          function(date) {
+            // 日曜日(0)と土曜日(6)をグレーアウトして選択不可に
+            return (date.getDay() === 0 || date.getDay() === 6);
+          }
+        ]
+      });
 
+      // LIFFの初期化
       liff.init({ liffId: LIFF_ID })
         .then(() => {
           if (!liff.isLoggedIn()) {
@@ -207,19 +261,17 @@
         .catch(err => console.error(err));
     });
 
-    // カレンダー選択時の土日判定ガード
-    function validateDate(input) {
-      if (!input.value) return;
-      
-      const selectedDate = new Date(input.value);
-      const dayOfWeek = selectedDate.getDay(); // 0:日曜日, 6:土曜日
-      
-      if (dayOfWeek === 0 || dayOfWeek === 6) {
-        alert("土日は選択できません。平日をお選びください。");
-        input.value = ""; // 入力をリセット
-      }
+    // ポップアップを開く・閉じる関数
+    function showModal(title, message) {
+      document.getElementById("modalTitle").innerText = title;
+      document.getElementById("modalMessage").innerHTML = message;
+      document.getElementById("customModal").style.display = "flex";
+    }
+    function closeModal() {
+      document.getElementById("customModal").style.display = "none";
     }
 
+    // 送信処理
     function submitSchedule() {
       const form = document.getElementById("scheduleForm");
       if (!form.checkValidity()) { 
@@ -237,16 +289,18 @@
 
       const messageText = `【面談希望日のご連絡】\nお名前：${userName}\n希望日：${dateVal}\n時間帯：${timeVal}\n\n※担当者からの返信をお待ちください。`;
 
+      // liff.isInClient() が true（LINE内で開いている）なら自動送信する
       if (liff.isInClient()) {
         liff.sendMessages([{ type: 'text', text: messageText }])
           .then(() => liff.closeWindow())
           .catch(() => {
-            alert("メッセージの送信に失敗しました。");
+            showModal("エラー", "メッセージの送信に失敗しました。");
             btn.disabled = false;
             btn.innerText = "この内容で送信してチャットへ";
           });
       } else {
-        alert("ブラウザで開いているためチャット送信はスキップされました。\n\n" + messageText);
+        // LINE以外（PCブラウザ等）で開いた場合のみ、自作のポップアップで案内を出す
+        showModal("ブラウザで開かれています", `テスト環境のためチャット送信はスキップされました。<br><br>【送信内容】<br>${dateVal} ${timeVal}`);
         btn.disabled = false;
         btn.innerText = "この内容で送信してチャットへ";
       }
