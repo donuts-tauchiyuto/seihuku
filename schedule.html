@@ -45,7 +45,6 @@
       margin-bottom: 24px;
     }
 
-    /* プロフィール表示エリア */
     .profile-box {
       display: flex;
       align-items: center;
@@ -147,7 +146,6 @@
   <div class="form-card">
     <div class="header-title">日程調整・お客様情報入力</div>
 
-    <!-- プロフィールエリア -->
     <div class="profile-box">
       <img id="profileImage" src="https://via.placeholder.com/48" alt="Profile">
       <span id="profileName">読み込み中...</span>
@@ -161,20 +159,19 @@
 
       <div class="form-group">
         <label>希望日（平日のみ） <span class="req">*</span></label>
-        <input type="date" id="dateSelect" required>
+        <!-- ★今日より前の日程を選択不可に制限★ -->
+        <input type="date" id="dateSelect" onchange="validateDate(this)" required>
         <span class="warning-text">⚠️土日は選択できません。平日をお選びください。</span>
       </div>
 
       <div class="form-group">
         <label>希望時間帯 <span class="req">*</span></label>
+        <!-- ★指定の3つの選択肢に変更★ -->
         <select id="timeSelect" required>
           <option value="" disabled selected>選択してください</option>
-          <option value="13:00 〜 13:30">13:00 〜 13:30</option>
-          <option value="14:00 〜 14:30">14:00 〜 14:30</option>
-          <option value="15:00 〜 15:30">15:00 〜 15:30</option>
-          <option value="16:00 〜 16:30">16:00 〜 16:30</option>
-          <option value="17:00 〜 17:30">17:00 〜 17:30</option>
-          <option value="18:00 〜 18:30">18:00 〜 18:30</option>
+          <option value="10:00 〜 11:00">10:00 〜 11:00</option>
+          <option value="17:00 〜 18:00">17:00 〜 18:00</option>
+          <option value="18:00 〜 19:00">18:00 〜 19:00</option>
         </select>
       </div>
 
@@ -183,10 +180,16 @@
   </div>
 
   <script>
-    // エントリーフォームと同じLIFF IDを使用します
     const LIFF_ID = "2011615012-KQalAnEM"; 
 
     document.addEventListener("DOMContentLoaded", function() {
+      // 本日の日付を取得してカレンダーの最小値(min)に設定（過去日を選択不可に）
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      document.getElementById("dateSelect").min = `${yyyy}-${mm}-${dd}`;
+
       liff.init({ liffId: LIFF_ID })
         .then(() => {
           if (!liff.isLoggedIn()) {
@@ -195,17 +198,27 @@
           }
           liff.getProfile()
             .then(profile => {
-              // プロフィール画像と名前をセット
               document.getElementById("profileImage").src = profile.pictureUrl || "https://via.placeholder.com/48";
               document.getElementById("profileName").innerText = profile.displayName + " さんとしてログイン中";
-              
-              // お名前欄にLINEの表示名をあらかじめ入力しておく（消して書き換えも可能）
               document.getElementById("userName").value = profile.displayName;
             })
             .catch(err => console.error(err));
         })
         .catch(err => console.error(err));
     });
+
+    // カレンダー選択時の土日判定ガード
+    function validateDate(input) {
+      if (!input.value) return;
+      
+      const selectedDate = new Date(input.value);
+      const dayOfWeek = selectedDate.getDay(); // 0:日曜日, 6:土曜日
+      
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        alert("土日は選択できません。平日をお選びください。");
+        input.value = ""; // 入力をリセット
+      }
+    }
 
     function submitSchedule() {
       const form = document.getElementById("scheduleForm");
@@ -218,19 +231,10 @@
       const dateVal = document.getElementById("dateSelect").value;
       const timeVal = document.getElementById("timeSelect").value;
 
-      // 土日チェック（プログラム側でもブロックする処理）
-      const selectedDate = new Date(dateVal);
-      const dayOfWeek = selectedDate.getDay();
-      if (dayOfWeek === 0 || dayOfWeek === 6) {
-        alert("土日は選択できません。カレンダーから平日をお選びください。");
-        return;
-      }
-
       const btn = document.getElementById("submitBtn");
       btn.disabled = true;
       btn.innerText = "送信中...";
 
-      // LINEのトークルームに自動送信するメッセージの作成
       const messageText = `【面談希望日のご連絡】\nお名前：${userName}\n希望日：${dateVal}\n時間帯：${timeVal}\n\n※担当者からの返信をお待ちください。`;
 
       if (liff.isInClient()) {
