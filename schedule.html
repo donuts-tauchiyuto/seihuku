@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>日程調整・お客様情報入力</title>
   
-  <!-- カレンダーを強化するライブラリ（Flatpickr）を読み込み -->
+  <!-- カレンダーを強化するライブラリ（Flatpickr） -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
@@ -14,172 +14,28 @@
   
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&display=swap');
-    
-    :root {
-      --primary-pink: #e6005c;
-      --accent-red: #ff3366;
-      --bg-light: #fff5f7;
-      --card-bg: #ffffff;
-      --text-main: #333333;
-      --border-color: #ffccd5;
-    }
-
+    :root { --primary-pink: #e6005c; --accent-red: #ff3366; --bg-light: #fff5f7; --card-bg: #ffffff; --text-main: #333333; --border-color: #ffccd5; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background-color: #fafafa;
-      color: var(--text-main);
-      font-family: 'Noto Sans JP', sans-serif;
-      min-height: 100vh;
-      padding: 20px 16px 40px;
-    }
-
-    .form-card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 24px 18px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-      width: 100%;
-      max-width: 500px;
-      margin: 0 auto;
-    }
-
-    .header-title {
-      text-align: center;
-      font-size: 1.3rem;
-      font-weight: 900;
-      color: var(--primary-pink);
-      margin-bottom: 24px;
-    }
-
-    .profile-box {
-      display: flex;
-      align-items: center;
-      background: #fff0f3;
-      padding: 12px 16px;
-      border-radius: 12px;
-      margin-bottom: 24px;
-      border: 1px solid var(--border-color);
-    }
-
-    .profile-box img {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      margin-right: 12px;
-      border: 2px solid #fff;
-      box-shadow: 0 2px 6px rgba(230, 0, 92, 0.2);
-    }
-
-    .profile-box span {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--primary-pink);
-    }
-
+    body { background-color: #fafafa; color: var(--text-main); font-family: 'Noto Sans JP', sans-serif; min-height: 100vh; padding: 20px 16px 40px; }
+    .form-card { background: var(--card-bg); border-radius: 16px; padding: 24px 18px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); width: 100%; max-width: 500px; margin: 0 auto; }
+    .header-title { text-align: center; font-size: 1.3rem; font-weight: 900; color: var(--primary-pink); margin-bottom: 24px; }
+    .profile-box { display: flex; align-items: center; background: #fff0f3; padding: 12px 16px; border-radius: 12px; margin-bottom: 24px; border: 1px solid var(--border-color); }
+    .profile-box img { width: 48px; height: 48px; border-radius: 50%; margin-right: 12px; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(230, 0, 92, 0.2); }
+    .profile-box span { font-size: 0.95rem; font-weight: 700; color: var(--primary-pink); }
     .form-group { margin-bottom: 20px; width: 100%; }
-
-    label {
-      display: flex;
-      align-items: center;
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: #444;
-      margin-bottom: 8px;
-    }
-
+    label { display: flex; align-items: center; font-size: 0.9rem; font-weight: 700; color: #444; margin-bottom: 8px; }
     .req { color: var(--accent-red); margin-left: 4px; font-weight: 900; }
-
-    input[type="text"], input[type="date"], select {
-      width: 100%;
-      -webkit-appearance: none;
-      appearance: none;
-      background: #ffffff;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 12px 14px;
-      color: #333;
-      font-size: 1rem;
-      outline: none;
-      font-family: inherit;
-      box-sizing: border-box;
-      min-height: 48px;
-    }
-
-    input:focus, select:focus {
-      border-color: var(--primary-pink);
-      box-shadow: 0 0 0 2px rgba(230, 0, 92, 0.1);
-    }
-
-    select {
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      background-size: 16px;
-      padding-right: 40px;
-    }
-
-    .submit-btn {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, var(--primary-pink) 0%, var(--accent-red) 100%);
-      border: none;
-      border-radius: 8px;
-      color: #fff;
-      font-size: 1.1rem;
-      font-weight: 900;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(230, 0, 92, 0.3);
-      margin-top: 16px;
-    }
-
-    .submit-btn:disabled {
-      background: #ccc;
-      box-shadow: none;
-      cursor: not-allowed;
-    }
-
-    /* オリジナルポップアップ（通知画面）のデザイン */
-    .custom-modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    }
-    .custom-modal {
-      background: #fff;
-      width: 85%;
-      max-width: 350px;
-      border-radius: 16px;
-      padding: 24px;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-    .custom-modal h3 {
-      color: var(--primary-pink);
-      margin-bottom: 12px;
-      font-size: 1.2rem;
-    }
-    .custom-modal p {
-      font-size: 0.95rem;
-      color: #444;
-      line-height: 1.5;
-      margin-bottom: 20px;
-    }
-    .custom-modal button {
-      background: var(--primary-pink);
-      color: #fff;
-      border: none;
-      padding: 12px 30px;
-      border-radius: 30px;
-      font-weight: bold;
-      font-size: 1rem;
-      cursor: pointer;
-      width: 100%;
-    }
+    input[type="text"], select { width: 100%; -webkit-appearance: none; appearance: none; background: #ffffff; border: 1px solid #ccc; border-radius: 8px; padding: 12px 14px; color: #333; font-size: 1rem; outline: none; font-family: inherit; box-sizing: border-box; min-height: 48px; }
+    input:focus, select:focus { border-color: var(--primary-pink); box-shadow: 0 0 0 2px rgba(230, 0, 92, 0.1); }
+    select { background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px; }
+    .submit-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--primary-pink) 0%, var(--accent-red) 100%); border: none; border-radius: 8px; color: #fff; font-size: 1.1rem; font-weight: 900; cursor: pointer; box-shadow: 0 4px 15px rgba(230, 0, 92, 0.3); margin-top: 16px; }
+    .submit-btn:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
+    /* カスタムポップアップ */
+    .custom-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+    .custom-modal { background: #fff; width: 85%; max-width: 350px; border-radius: 16px; padding: 24px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+    .custom-modal h3 { color: var(--primary-pink); margin-bottom: 12px; font-size: 1.2rem; }
+    .custom-modal p { font-size: 0.95rem; color: #444; line-height: 1.5; margin-bottom: 20px; }
+    .custom-modal button { background: var(--primary-pink); color: #fff; border: none; padding: 12px 30px; border-radius: 30px; font-weight: bold; font-size: 1rem; cursor: pointer; width: 100%; }
   </style>
 </head>
 <body>
@@ -200,7 +56,6 @@
 
       <div class="form-group">
         <label>希望日（平日のみ） <span class="req">*</span></label>
-        <!-- HTML標準カレンダーではなく、文字入力風にしてFlatpickrを呼び出す -->
         <input type="text" id="dateSelect" placeholder="日付を選択してください" readonly required>
       </div>
 
@@ -218,7 +73,6 @@
     </form>
   </div>
 
-  <!-- ドメイン名を隠すためのオリジナルポップアップ -->
   <div id="customModal" class="custom-modal-overlay">
     <div class="custom-modal">
       <h3 id="modalTitle">通知</h3>
@@ -228,20 +82,38 @@
   </div>
 
   <script>
-    const LIFF_ID = "2011615012-KQalAnEM"; 
+    // ★★★ここに新しく作成した「日程調整用のLIFF ID」を入れてください★★★
+    const LIFF_ID = "2011615012-3T727ZCa"; 
 
-    // ★カレンダー（Flatpickr）の初期設定
     document.addEventListener("DOMContentLoaded", function() {
-      flatpickr("#dateSelect", {
-        locale: "ja",             // 日本語化
-        minDate: "today",         // 過去の日付をグレーアウトして選択不可に
-        disable: [
-          function(date) {
-            // 日曜日(0)と土曜日(6)をグレーアウトして選択不可に
-            return (date.getDay() === 0 || date.getDay() === 6);
-          }
-        ]
-      });
+      // 祝日APIから日本の祝日データを取得
+      fetch("https://holidays-jp.github.io/api/v1/date.json")
+        .then(response => response.json())
+        .then(holidays => {
+          // カレンダー（Flatpickr）の初期設定
+          flatpickr("#dateSelect", {
+            locale: "ja",
+            minDate: "today",
+            disable: [
+              function(date) {
+                // 土日判定（0:日曜日, 6:土曜日）
+                if (date.getDay() === 0 || date.getDay() === 6) return true;
+                
+                // 祝日判定
+                const y = date.getFullYear();
+                const m = String(date.getMonth() + 1).padStart(2, '0');
+                const d = String(date.getDate()).padStart(2, '0');
+                const formattedDate = `${y}-${m}-${d}`;
+                
+                return holidays.hasOwnProperty(formattedDate); // 祝日リストにあれば無効化
+              }
+            ]
+          });
+        })
+        .catch(err => {
+          // API取得失敗時は土日のみ無効化して安全にフォールバック
+          flatpickr("#dateSelect", { locale: "ja", minDate: "today", disable: [ function(date) { return (date.getDay() === 0 || date.getDay() === 6); } ] });
+        });
 
       // LIFFの初期化
       liff.init({ liffId: LIFF_ID })
@@ -261,7 +133,6 @@
         .catch(err => console.error(err));
     });
 
-    // ポップアップを開く・閉じる関数
     function showModal(title, message) {
       document.getElementById("modalTitle").innerText = title;
       document.getElementById("modalMessage").innerHTML = message;
@@ -271,25 +142,20 @@
       document.getElementById("customModal").style.display = "none";
     }
 
-    // 送信処理
     function submitSchedule() {
       const form = document.getElementById("scheduleForm");
-      if (!form.checkValidity()) { 
-        form.reportValidity(); 
-        return; 
-      }
+      if (!form.checkValidity()) { form.reportValidity(); return; }
 
       const userName = document.getElementById("userName").value;
       const dateVal = document.getElementById("dateSelect").value;
       const timeVal = document.getElementById("timeSelect").value;
-
       const btn = document.getElementById("submitBtn");
+      
       btn.disabled = true;
       btn.innerText = "送信中...";
 
       const messageText = `【面談希望日のご連絡】\nお名前：${userName}\n希望日：${dateVal}\n時間帯：${timeVal}\n\n※担当者からの返信をお待ちください。`;
 
-      // liff.isInClient() が true（LINE内で開いている）なら自動送信する
       if (liff.isInClient()) {
         liff.sendMessages([{ type: 'text', text: messageText }])
           .then(() => liff.closeWindow())
@@ -299,7 +165,6 @@
             btn.innerText = "この内容で送信してチャットへ";
           });
       } else {
-        // LINE以外（PCブラウザ等）で開いた場合のみ、自作のポップアップで案内を出す
         showModal("ブラウザで開かれています", `テスト環境のためチャット送信はスキップされました。<br><br>【送信内容】<br>${dateVal} ${timeVal}`);
         btn.disabled = false;
         btn.innerText = "この内容で送信してチャットへ";
