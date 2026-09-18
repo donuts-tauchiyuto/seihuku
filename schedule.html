@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>日程調整・お客様情報入力</title>
   
-  <!-- カレンダーを強化するライブラリ（Flatpickr） -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
@@ -19,6 +18,12 @@
     body { background-color: #fafafa; color: var(--text-main); font-family: 'Noto Sans JP', sans-serif; min-height: 100vh; padding: 20px 16px 40px; }
     .form-card { background: var(--card-bg); border-radius: 16px; padding: 24px 18px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); width: 100%; max-width: 500px; margin: 0 auto; }
     .header-title { text-align: center; font-size: 1.3rem; font-weight: 900; color: var(--primary-pink); margin-bottom: 24px; }
+    
+    /* ★ 完了画面のスタイル */
+    .already-submitted { display: none; text-align: center; padding: 20px 10px; }
+    .already-submitted h2 { color: var(--primary-pink); font-size: 1.2rem; margin-bottom: 16px; }
+    .already-submitted p { color: #555; font-size: 0.95rem; line-height: 1.6; font-weight: 700; }
+
     .profile-box { display: flex; align-items: center; background: #fff0f3; padding: 12px 16px; border-radius: 12px; margin-bottom: 24px; border: 1px solid var(--border-color); }
     .profile-box img { width: 48px; height: 48px; border-radius: 50%; margin-right: 12px; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(230, 0, 92, 0.2); }
     .profile-box span { font-size: 0.95rem; font-weight: 700; color: var(--primary-pink); }
@@ -30,7 +35,6 @@
     select { background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px; }
     .submit-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--primary-pink) 0%, var(--accent-red) 100%); border: none; border-radius: 8px; color: #fff; font-size: 1.1rem; font-weight: 900; cursor: pointer; box-shadow: 0 4px 15px rgba(230, 0, 92, 0.3); margin-top: 16px; }
     .submit-btn:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
-    /* カスタムポップアップ */
     .custom-modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
     .custom-modal { background: #fff; width: 85%; max-width: 350px; border-radius: 16px; padding: 24px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
     .custom-modal h3 { color: var(--primary-pink); margin-bottom: 12px; font-size: 1.2rem; }
@@ -43,34 +47,43 @@
   <div class="form-card">
     <div class="header-title">日程調整・お客様情報入力</div>
 
-    <div class="profile-box">
-      <img id="profileImage" src="https://via.placeholder.com/48" alt="Profile">
-      <span id="profileName">読み込み中...</span>
+    <!-- ★ すでに回答済みの場合に出す画面 -->
+    <div id="alreadySubmitted" class="already-submitted">
+      <h2>✅ 日程調整は完了しています</h2>
+      <p>日時の変更をご希望の場合は、<br>トークルームのメッセージにて<br>直接担当者へご連絡ください！</p>
     </div>
 
-    <form id="scheduleForm">
-      <div class="form-group">
-        <label>お名前 <span class="req">*</span></label>
-        <input type="text" id="userName" placeholder="例：山田 花子" required>
+    <!-- ★ フォーム全体を囲むコンテナ -->
+    <div id="formContainer">
+      <div class="profile-box">
+        <img id="profileImage" src="https://via.placeholder.com/48" alt="Profile">
+        <span id="profileName">読み込み中...</span>
       </div>
 
-      <div class="form-group">
-        <label>希望日（平日のみ） <span class="req">*</span></label>
-        <input type="text" id="dateSelect" placeholder="日付を選択してください" readonly required>
-      </div>
+      <form id="scheduleForm">
+        <div class="form-group">
+          <label>お名前 <span class="req">*</span></label>
+          <input type="text" id="userName" placeholder="例：山田 花子" required>
+        </div>
 
-      <div class="form-group">
-        <label>希望時間帯 <span class="req">*</span></label>
-        <select id="timeSelect" required>
-          <option value="" disabled selected>選択してください</option>
-          <option value="10:00 〜 11:00">10:00 〜 11:00</option>
-          <option value="17:00 〜 18:00">17:00 〜 18:00</option>
-          <option value="18:00 〜 19:00">18:00 〜 19:00</option>
-        </select>
-      </div>
+        <div class="form-group">
+          <label>希望日（平日のみ） <span class="req">*</span></label>
+          <input type="text" id="dateSelect" placeholder="日付を選択してください" readonly required>
+        </div>
 
-      <button type="button" class="submit-btn" id="submitBtn" onclick="submitSchedule()">この内容で送信してチャットへ</button>
-    </form>
+        <div class="form-group">
+          <label>希望時間帯 <span class="req">*</span></label>
+          <select id="timeSelect" required>
+            <option value="" disabled selected>選択してください</option>
+            <option value="10:00 〜 11:00">10:00 〜 11:00</option>
+            <option value="17:00 〜 18:00">17:00 〜 18:00</option>
+            <option value="18:00 〜 19:00">18:00 〜 19:00</option>
+          </select>
+        </div>
+
+        <button type="button" class="submit-btn" id="submitBtn" onclick="submitSchedule()">この内容で送信してチャットへ</button>
+      </form>
+    </div>
   </div>
 
   <div id="customModal" class="custom-modal-overlay">
@@ -82,40 +95,33 @@
   </div>
 
   <script>
-    // ★★★ここに新しく作成した「日程調整用のLIFF ID」を入れてください★★★
     const LIFF_ID = "2011615012-3T727ZCa"; 
+    // ★★★ ここにデプロイしたGASのURL（/execで終わるもの）を必ず入れてください ★★★
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyOlALG5EBN8I8dD03gLU3scAyoZ2CtYJPxZuWF_zCLZivRXBgWKmiBPvr-m36rMUGKBA/exec";
 
     document.addEventListener("DOMContentLoaded", function() {
-      // 祝日APIから日本の祝日データを取得
       fetch("https://holidays-jp.github.io/api/v1/date.json")
         .then(response => response.json())
         .then(holidays => {
-          // カレンダー（Flatpickr）の初期設定
           flatpickr("#dateSelect", {
             locale: "ja",
             minDate: "today",
             disable: [
               function(date) {
-                // 土日判定（0:日曜日, 6:土曜日）
                 if (date.getDay() === 0 || date.getDay() === 6) return true;
-                
-                // 祝日判定
                 const y = date.getFullYear();
                 const m = String(date.getMonth() + 1).padStart(2, '0');
                 const d = String(date.getDate()).padStart(2, '0');
                 const formattedDate = `${y}-${m}-${d}`;
-                
-                return holidays.hasOwnProperty(formattedDate); // 祝日リストにあれば無効化
+                return holidays.hasOwnProperty(formattedDate);
               }
             ]
           });
         })
         .catch(err => {
-          // API取得失敗時は土日のみ無効化して安全にフォールバック
           flatpickr("#dateSelect", { locale: "ja", minDate: "today", disable: [ function(date) { return (date.getDay() === 0 || date.getDay() === 6); } ] });
         });
 
-      // LIFFの初期化
       liff.init({ liffId: LIFF_ID })
         .then(() => {
           if (!liff.isLoggedIn()) {
@@ -127,6 +133,17 @@
               document.getElementById("profileImage").src = profile.pictureUrl || "https://via.placeholder.com/48";
               document.getElementById("profileName").innerText = profile.displayName + " さんとしてログイン中";
               document.getElementById("userName").value = profile.displayName;
+
+              // ★ 重複チェック：GASに問い合わせる
+              fetch(`${GAS_URL}?userId=${encodeURIComponent(profile.userId)}`)
+                .then(res => res.json())
+                .then(data => {
+                  if (data.hasSchedule) {
+                    document.getElementById("formContainer").style.display = "none";
+                    document.getElementById("alreadySubmitted").style.display = "block";
+                  }
+                })
+                .catch(err => console.error(err));
             })
             .catch(err => console.error(err));
         })
